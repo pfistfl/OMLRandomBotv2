@@ -15,7 +15,7 @@ For now, this is a design Document for the new OpenML Bot
 - Cubist
 - fully connected neural networks (mxnet?)
 
-** Worthy Candidates (From Kaggle etc.)
+** Worthy Candidates (From Kaggle etc.)**
 - ExtraTrees
 - Lightgbm / Catboost
 - LibFM (Factorization Machines)
@@ -28,4 +28,5 @@ For now, this is a design Document for the new OpenML Bot
 # Open Questions:
 - Can we use batchtools and slurm scheduling?
 - Divide into big / small datasets and fast / slow learners?
-- Sample according to algo param space?
+- Sample according to algo paramset dimensions?
+- 
