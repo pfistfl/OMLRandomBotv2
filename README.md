@@ -15,7 +15,7 @@ For now, this is a design Document for the new OpenML Bot
 - Cubist
 - fully connected neural networks (mxnet?)
 
-** Worthy Candidates (From Kaggle etc.)**
+**Worthy Candidates (From Kaggle etc.)**
 - ExtraTrees
 - Lightgbm / Catboost
 - LibFM (Factorization Machines)
