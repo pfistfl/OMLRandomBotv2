@@ -5,20 +5,23 @@ For now, this is a design Document for the new OpenML Bot
 
 **From the old bot**
 - xgboost
-- svm 
+- svm
 - kernel knn
 - random forest
 - rpart
 - glmnet
 
 **New learners**
+- Multinomial Logit (from mxnet?)
 - Cubist
-- fully connected neural networks (mxnet?)
+- fully connected neural networks (mxnet?) up to depth 3 or 4
 
-** Worthy Candidates (From Kaggle etc.)
-- ExtraTrees
-- Lightgbm / Catboost
-- LibFM (Factorization Machines)
+**Worthy Candidates (From Kaggle etc.)**
+- ExtraTrees (we can enable this in ranger)
+- Lightgbm / Catboost (Probably to similar to xgboost)
+- LibFM (Factorization Machines)[https://github.com/dselivanov/rsparse]
+- LiquidSVM
+- Adaboost
 
 
 # Datasets
