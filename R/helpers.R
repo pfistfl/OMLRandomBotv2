@@ -14,3 +14,9 @@ load_or_create_registry = function(regname = "bot_registry", overwrite = FALSE,
     reg = loadRegistry(regname, writeable = TRUE)
   }
 }
+
+#' Runs the Bot
+runBot = function(task.id) {
+  bot = RandomBot$new(as.character(task.id))
+  bot$run()
+}
