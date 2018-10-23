@@ -75,7 +75,9 @@ RandomBot = R6Class("RandomOMLBot",
     #' @return list of one learner with matching parameter set
     sample_random_learner = function() {
       lrn = list_learners(self$task)
-      sample(lrn$learners, size = 1, prob = lrn$learner.probs)[[1]]
+      lrn.cl = sample(lrn$learners, size = 1, prob = lrn$learner.probs)[[1]]
+      # FIXME: Set probs, other pars here?
+      makeLearner(lrn.cl)
     },
     #' Get a learner parset for a sampled learner
     #' @return A ParamSet
