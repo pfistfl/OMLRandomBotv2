@@ -1,4 +1,3 @@
-
 #' Either loads of creates a registry
 load_or_create_registry = function(regname = "bot_registry", overwrite = FALSE,
   source.packages = c("mlr", "data.table"), source.files) {
@@ -13,10 +12,4 @@ load_or_create_registry = function(regname = "bot_registry", overwrite = FALSE,
   } else {
     reg = loadRegistry(regname, writeable = TRUE)
   }
-}
-
-#' Runs the Bot
-runBot = function(task.id) {
-  bot = RandomBot$new(as.character(task.id))
-  bot$run()
 }
