@@ -2,18 +2,18 @@ library(R6)
 library(OpenML)
 
 #' Class OMLBot
-#' Public Members: 
+#' Public Members:
 #' task.id [character(1)]
 #' task [Task]
-#' 
+#'
 #' initialize [function(task.id)]
 #' run [function()]
 #'
-#' Private Members: 
+#' Private Members:
 #' learner [learner]
 #' parset [ParamSet]
 #' pars [list]
-#' 
+#'
 #' get_learner_config [function()]
 #'
 Bot = R6Class("OMLBot",
@@ -46,16 +46,16 @@ Bot = R6Class("OMLBot",
 
 #' Class RandomOMLBot
 #' inherits from [OMLBot]
-#' Public Members: 
+#' Public Members:
 #' < inherited >
 #'
-#' Private Members: 
+#' Private Members:
 #'
 #' get_learner_config [function()]
 #' sample_random_learner [function()]
 #' get_learner_parset [function()]
 #' sample_random_config [function()]
-#' 
+#'
 RandomBot = R6Class("RandomOMLBot",
   inherit = Bot,
 
@@ -68,16 +68,20 @@ RandomBot = R6Class("RandomOMLBot",
       private$learner = private$sample_random_learner()
       private$parset = private$get_learner_parset()
       private$pars = private$sample_random_config()
-      lrn = setHyperPars(private$learner, par.vals = private$parset)
+      lrn = setHyperPars(private$learner, par.vals = private$pars)
       return(lrn)
     },
     #' Sample a random learner from a set of learners
     #' @return list of one learner with matching parameter set
     sample_random_learner = function() {
       lrn = list_learners(self$task)
-      lrn.cl = sample(lrn$learners, size = 1, prob = lrn$learner.probs)[[1]]
-      # FIXME: Set probs, other pars here?
-      makeLearner(lrn.cl)
+        # Sample according to learner parameter set dimensions
+      lrn.probs = get_learner_probs(lrn)
+      lrn.cl = sample(lrn, size = 1, prob = lrn.probs)
+      lrn = makeLearner(lrn.cl)
+      # Set predict.type
+      if ("prob" %in% getLearnerProperties(lrn))
+        lrn = setPredictType(lrn, "prob")
     },
     #' Get a learner parset for a sampled learner
     #' @return A ParamSet
