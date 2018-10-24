@@ -7,10 +7,6 @@ sapply(source, source.files)
 reg = load_or_create_registry("randombot_reg", overwrite = FALSE,
   source.files = source.files, source.pkgs = source.pkgs)
 
-#' Function that runs the Bot
-runBot = function(task.id) {
-
-}
 
 for (task.id in task.ids) {
   addProblem(name = task.id, data = list(task.id = as.character(task.id)), seed = 42)
