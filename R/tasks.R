@@ -9,11 +9,18 @@ get_task_name = function(task.id) {
 }
 
 #' Get task metadata
-get_task_metadata = function(task) {
-  md = list(p = 1, n = 1)
-  if (is.null(task)) {
+#' @param oml.task [OMLTask] a OpenML Task.
+#' @return [list] named list of metafeatures
+get_task_metadata = function(oml.task = NULL) {
+  # Return some defaults, just make sure we can construct the paramset without
+  # a task.
+  md = list(p = 20, n = 100)
+  if (!is.null(oml.task)) {
+    task = convertOMLTaskToMlr(oml.task)$mlr.task
     md$p = getTaskNFeats(task)
-    md$n = getTaskSize(task)
+    # n is the number of points in the training data.
+    # take the minimum over CV splits.
+    md$n = min(sapply(oml.task$mlr.rin$train.inds, length))
   }
   return(md)
 }

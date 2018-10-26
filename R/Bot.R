@@ -1,5 +1,6 @@
 library(R6)
 library(OpenML)
+library(BBmisc)
 
 #-----------------------------------------------------------------------------------------
 #' Class OMLBot
@@ -21,6 +22,7 @@ Bot = R6Class("OMLBot",
 
   public = list(
     task.id = NULL,
+    oml.task = NULL,
     task = NULL,
 
     initialize = function(task.id) {
@@ -28,7 +30,7 @@ Bot = R6Class("OMLBot",
     },
 
     run = function() {
-      oml.task = getOMLTask(as.numeric(self$task.id))
+      self$oml.task = getOMLTask(as.numeric(self$task.id))
       self$task = convertOMLTaskToMlr(oml.task)$mlr.task
       lrn = private$get_learner_config()
       measures = private$get_measures()
@@ -71,6 +73,8 @@ RandomBot = R6Class("RandomOMLBot",
       private$parset = private$get_learner_parset()
       private$pars = private$sample_random_config()
       lrn = setHyperPars(private$learner, par.vals = private$pars)
+      # FIXME: How do we send additional, learner dependent configs
+      #        like nthread for xgboost
       return(lrn)
     },
     #' Sample a random learner from a set of learners

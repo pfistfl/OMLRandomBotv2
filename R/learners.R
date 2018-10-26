@@ -2,10 +2,9 @@
 #' @param task [Task] input task
 #' @return [character(n)] vector of learner.ids
 list_learners = function(task) {
-  # Only list learners that work with the task the
+  # Only list learners that work with the task:
   bot.lrns = c("classif.glmnet", "classif.rpart", "classif.kknn",
   	"classif.svm", "classif.ranger", "classif.xgboost")
-
   avail.lrns = listLearners(task, quiet = TRUE,
    warn.missing.packages = FALSE)$class
   lrn.inds = which(bot.lrns %in% avail.lrns)
@@ -15,7 +14,9 @@ list_learners = function(task) {
 
 #' Get probabilities to draw a learner
 #' @param learners [character(n)] vector of learner id's
-#' @param sampling [character(1)] "uniform" or "parset_dims"
+#' @param sampling [character(1)] "uniform" or "parset_dims".
+#'   "uniform" draws each learner equally likely, while parset dims
+#'   draws learners proportional to their parameter set dimensions.
 #' @return [numeric(n)] sampling probabilities for each learner
 get_learner_probs = function(learners, sampling = "parset_dims") {
   if (sampling == "uniform") {
@@ -32,10 +33,10 @@ get_learner_probs = function(learners, sampling = "parset_dims") {
 
 
 #' Create the paramset for a given learner or task
-#' @param task [Task] input task
+#' @param oml.task [OMLTask] input task (for data dependent parameters)
 #' @param learner [Learner] learner
 #' @return [ParamSet]
-get_parset = function(learner, task = NULL) {
+get_parset = function(learner, oml.task = NULL) {
   learner = checkLearner(learner)
   switch(learner$id,
     "classif.glmnet" = make_check_parset(learner,
@@ -62,15 +63,15 @@ get_parset = function(learner, task = NULL) {
         makeIntegerParam("degree", lower = 2, upper = 5, requires = quote(kernel == "polynomial")))
         ),
     "classif.ranger" = {
-      md = get_task_metadata(task)
+      task.metadata = get_task_metadata(oml.task)
       make_check_parset(learner,
       parset = makeParamSet(
         makeIntegerParam("num.trees", lower = 1, upper = 2000),
         makeLogicalParam("replace"),
         makeNumericParam("sample.fraction", lower = 0.1, upper = 1),
-        makeIntegerParam("mtry", lower = 0, upper = md$p),
+        makeIntegerParam("mtry", lower = 0, upper = task.metadata$p),
         makeLogicalParam("respect.unordered.factors"),
-        makeIntegerParam("min.node.size", lower = 1, upper = min(60, md$n)),
+        makeIntegerParam("min.node.size", lower = 1, upper = min(60, task.metadata$n)),
         makeDiscreteParam("splitrule", values = c("gini", "extratrees")))
         )
       },
