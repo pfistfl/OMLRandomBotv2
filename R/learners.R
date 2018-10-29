@@ -24,8 +24,8 @@ get_learner_probs = function(learners, sampling = "parset_dims") {
   } else if (sampling == "parset_dims") {
     wts = sapply(learners, function(x) {
       lrn = makeLearner(x)
-      ps = get_parset(lrn)
-      getParamNr(ps)
+      ps = get_parset(lrn, add_fixed_pars = FALSE)
+      getParamNr(ps$parset)
     })
   }
   return(wts / sum(wts))
@@ -35,17 +35,18 @@ get_learner_probs = function(learners, sampling = "parset_dims") {
 #' Create the paramset for a given learner or task
 #' @param oml.task [OMLTask] input task (for data dependent parameters)
 #' @param learner [Learner] learner
+#' @param extra.pars [logical(1)] should extra non-hyperparameters (e.g. nthread) be added?
 #' @return [ParamSet]
-get_parset = function(learner, oml.task = NULL) {
+get_parset = function(learner, oml.task = NULL, add_fixed_pars = TRUE) {
   learner = checkLearner(learner)
   switch(learner$id,
-    "classif.glmnet" = make_check_parset(learner,
+    "classif.glmnet" = make_check_parset(learner, add_fixed_pars,
       parset = makeParamSet(
         makeNumericParam("alpha", lower = 0, upper = 1, default = 1),
         makeNumericVectorParam("lambda", len = 1L, lower = -10, upper = 10, default = 0,
           trafo = function(x) 2^x))
       ),
-    "classif.rpart" = make_check_parset(learner,
+    "classif.rpart" = make_check_parset(learner, add_fixed_pars,
       parset = makeParamSet(
         makeNumericParam("cp", lower = 0, upper = 1, default = 0.01),
         makeIntegerParam("maxdepth", lower = 1, upper = 30, default = 30),
@@ -55,7 +56,7 @@ get_parset = function(learner, oml.task = NULL) {
     "classif.kknn" = make_check_parset(learner,
       parset = makeParamSet(makeIntegerParam("k", lower = 1, upper = 30))
         ),
-    "classif.svm" = make_check_parset(learner,
+    "classif.svm" = make_check_parset(learner, add_fixed_pars,
       parset = makeParamSet(
         makeDiscreteParam("kernel", values = c("linear", "polynomial", "radial")),
         makeNumericParam("cost", lower = -10, upper = 10, trafo = function(x) 2^x),
@@ -64,7 +65,7 @@ get_parset = function(learner, oml.task = NULL) {
         ),
     "classif.ranger" = {
       task.metadata = get_task_metadata(oml.task)
-      make_check_parset(learner,
+      make_check_parset(learner, add_fixed_pars,
       parset = makeParamSet(
         makeIntegerParam("num.trees", lower = 1, upper = 2000),
         makeLogicalParam("replace"),
@@ -75,7 +76,7 @@ get_parset = function(learner, oml.task = NULL) {
         makeDiscreteParam("splitrule", values = c("gini", "extratrees")))
         )
       },
-    "classif.xgboost" = make_check_parset(learner,
+    "classif.xgboost" = make_check_parset(learner, add_fixed_pars,
       # FIXME: Sample gbtree and gblinear with equal probabilities?
       parset = makeParamSet(
         makeIntegerParam("nrounds", lower = 1, upper = 5000),
@@ -87,26 +88,31 @@ get_parset = function(learner, oml.task = NULL) {
         makeNumericParam("colsample_bytree", lower = 0, upper = 1, requires = quote(booster == "gbtree")),
         makeNumericParam("colsample_bylevel", lower = 0, upper = 1, requires = quote(booster == "gbtree")),
         makeNumericParam("lambda", lower = -10, upper = 10, trafo = function(x) 2^x),
-        makeNumericParam("alpha", lower = -10, upper = 10, trafo = function(x) 2^x))
+        makeNumericParam("alpha", lower = -10, upper = 10, trafo = function(x) 2^x)),
+      fixed_pars = makeParamSet(makeIntegerParam("nthread", lower = 1, upper = 1))
       )
     )
+
 }
 
 
 #' @title make_check_param_set
 #' @description  Create a learner-parameter set.
 #'   Check whether param set and learner amtch
-#' @param learner learner object
-#' @param parset parameter set, that matches the learner
+#' @param learner [Learner] object
+#' @param parset [ParamSet], that matches the learner
 #' @return [ParamSet]
-make_check_parset = function(learner, parset) {
+make_check_parset = function(learner, add_fixed_pars, parset, fixed_pars = NULL) {
   checkLearner(learner)
   checkParamSet(parset)
+  if (!is.null(fixed_pars) & add_fixed_pars)
+    checkParamSet(fixed_pars)
 
   par.match = names(parset$pars) %in% names(learner$par.set$pars)
   if(!all(par.match)){
     stop(paste("The following parameters in param.set are not included in learner:",
       paste(names(parset$pars[par.match == FALSE]), collapse = ", ")))
   }
+  if (add_fixed_pars) parset = c(parset, fixed_pars)
   return(parset)
 }

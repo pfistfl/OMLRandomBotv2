@@ -10,6 +10,7 @@ library(BBmisc)
 #'
 #' initialize [function(task.id)]
 #' run [function()]
+#' run_internal
 #'
 #' Private Members:
 #' learner [learner]
@@ -24,18 +25,22 @@ Bot = R6Class("OMLBot",
     task.id = NULL,
     oml.task = NULL,
     task = NULL,
+    timeout = 360,
 
     initialize = function(task.id) {
       self$task.id = task.id
     },
-
-    run = function() {
-      self$oml.task = getOMLTask(as.numeric(self$task.id))
-      self$task = convertOMLTaskToMlr(oml.task)$mlr.task
+    run = function () {
+      self$oml.task = OpenML::getOMLTask(as.numeric(self$task.id))
+      self$task = OpenML::convertOMLTaskToMlr(oml.task)$mlr.task
       lrn = private$get_learner_config()
       measures = private$get_measures()
-      run = runTaskMlr(oml.task, lrn, measures)
-      return(run)
+      # Run training in a separate process with a specified timeout
+      callr::r(self$run_internal, args = list(oml.task = self$oml.task, lrn = lrn, measures = measures),
+        timeout = self$timeout)
+    },
+    run_internal = function(oml.task, lrn, measures) {
+      OpenML::runTaskMlr(oml.task, lrn, measures)
     }
   ),
 
@@ -43,7 +48,7 @@ Bot = R6Class("OMLBot",
     learner = NULL,
     parset = NULL,
     pars = NULL,
-    get_learner_config = function() {}
+    get_learner_config = function() {},
     )
 )
 

@@ -33,4 +33,22 @@ For now, this is a design Document for the new OpenML Bot
 - Can we use batchtools and slurm scheduling?
 - Divide into big / small datasets and fast / slow learners?
 - Sample according to algo paramset dimensions?
--
+
+
+
+# Required packages
+```
+# Benchmark
+library(mlr)
+library(batchtools)
+library(R6)
+library(evaluate)
+library(data.table)
+
+# Learners
+library(rpart)
+library(glmnet)
+library(e1071)
+library(ranger)
+library(xgboost)
+```
