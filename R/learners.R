@@ -94,13 +94,15 @@ get_parset = function(learner, oml.task = NULL, add_fixed_pars = TRUE) {
 }
 
 
-#' @title make_check_param_set
+#' Create and check a Paramset
 #' @description  Create a learner-parameter set.
 #'   Check whether param set and learner amtch
 #' @param learner [Learner] object
 #' @param parset [ParamSet], that matches the learner
 #' @return [ParamSet]
 make_check_parset = function(learner, add_fixed_pars, parset, fixed_pars = NULL) {
+  # FIXME: The add_fixed_pars is currently a little ugly.
+  #        We can improve this at some point
   checkLearner(learner)
   checkParamSet(parset)
   if (!is.null(fixed_pars) & add_fixed_pars)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/learners.R
 \name{make_check_parset}
 \alias{make_check_parset}
-\title{make_check_param_set}
+\title{Create and check a Paramset}
 \usage{
 make_check_parset(learner, add_fixed_pars, parset, fixed_pars = NULL)
 }

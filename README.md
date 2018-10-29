@@ -35,6 +35,13 @@ For now, this is a design Document for the new OpenML Bot
 - Sample according to algo paramset dimensions?
 
 
+# How do I run it?
+
+We currently require a OML `task.id` for the bot to run
+```
+bot = OMLRandomBot$new(11)
+bot$run()
+```
 
 # Required packages
 ```
@@ -42,7 +49,7 @@ For now, this is a design Document for the new OpenML Bot
 library(mlr)
 library(batchtools)
 library(R6)
-library(evaluate)
+library(callr)
 library(data.table)
 library(ParamHelpers)
 
