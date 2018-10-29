@@ -5,11 +5,11 @@ load_or_create_registry = function(regname = "bot_registry", overwrite = FALSE,
     unlink(regname, recursive = TRUE)
 
   if (!dir.exists(regname)) {
-    reg = makeExperimentRegistry(
+    reg = batchtools::makeExperimentRegistry(
       regname,
       packages = source.pkgs,
       source = source.files)
   } else {
-    reg = loadRegistry(regname, writeable = TRUE)
+    reg = batchtools::loadRegistry(regname, writeable = TRUE)
   }
 }

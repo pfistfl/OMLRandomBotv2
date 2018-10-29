@@ -24,8 +24,8 @@ get_learner_probs = function(learners, sampling = "parset_dims") {
   } else if (sampling == "parset_dims") {
     wts = sapply(learners, function(x) {
       lrn = makeLearner(x)
-      ps = get_parset(lrn, add_fixed_pars = FALSE)
-      getParamNr(ps$parset)
+      parset = get_parset(lrn, add_fixed_pars = FALSE)
+      getParamNr(parset)
     })
   }
   return(wts / sum(wts))
@@ -53,7 +53,7 @@ get_parset = function(learner, oml.task = NULL, add_fixed_pars = TRUE) {
         makeIntegerParam("minbucket", lower = 1, upper = 60, default = 1),
         makeIntegerParam("minsplit", lower = 1, upper = 60, default = 20))
       ),
-    "classif.kknn" = make_check_parset(learner,
+    "classif.kknn" = make_check_parset(learner, add_fixed_pars,
       parset = makeParamSet(makeIntegerParam("k", lower = 1, upper = 30))
         ),
     "classif.svm" = make_check_parset(learner, add_fixed_pars,
@@ -71,7 +71,7 @@ get_parset = function(learner, oml.task = NULL, add_fixed_pars = TRUE) {
         makeLogicalParam("replace"),
         makeNumericParam("sample.fraction", lower = 0.1, upper = 1),
         makeIntegerParam("mtry", lower = 0, upper = task.metadata$p),
-        makeLogicalParam("respect.unordered.factors"),
+        makeDiscreteParam("respect.unordered.factors", values = c("ignore", "order", "partition")),
         makeIntegerParam("min.node.size", lower = 1, upper = min(60, task.metadata$n)),
         makeDiscreteParam("splitrule", values = c("gini", "extratrees")))
         )
@@ -92,7 +92,6 @@ get_parset = function(learner, oml.task = NULL, add_fixed_pars = TRUE) {
       fixed_pars = makeParamSet(makeIntegerParam("nthread", lower = 1, upper = 1))
       )
     )
-
 }
 
 

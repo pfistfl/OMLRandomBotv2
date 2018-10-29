@@ -32,7 +32,7 @@ Bot = R6Class("OMLBot",
     },
     run = function () {
       self$oml.task = OpenML::getOMLTask(as.numeric(self$task.id))
-      self$task = OpenML::convertOMLTaskToMlr(oml.task)$mlr.task
+      self$task = OpenML::convertOMLTaskToMlr(self$oml.task)$mlr.task
       lrn = private$get_learner_config()
       measures = private$get_measures()
       # Run training in a separate process with a specified timeout
@@ -40,7 +40,8 @@ Bot = R6Class("OMLBot",
         timeout = self$timeout)
     },
     run_internal = function(oml.task, lrn, measures) {
-      OpenML::runTaskMlr(oml.task, lrn, measures)
+      options(mlr.show.info = TRUE)
+      OpenML::runTaskMlr(task = oml.task, learner = lrn, measures = measures)
     }
   ),
 
@@ -48,7 +49,7 @@ Bot = R6Class("OMLBot",
     learner = NULL,
     parset = NULL,
     pars = NULL,
-    get_learner_config = function() {},
+    get_learner_config = function() {}
     )
 )
 
@@ -98,7 +99,7 @@ RandomBot = R6Class("RandomOMLBot",
     #' Get a learner parset for a sampled learner
     #' @return A ParamSet
     get_learner_parset = function() {
-      get_parset(private$learner, self$task)
+      get_parset(private$learner, self$oml.task)
     },
     #' Sample a random configuration for a selected learner
     #' @return data.frame where each row is one valid configuration

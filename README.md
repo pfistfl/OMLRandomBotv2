@@ -44,6 +44,7 @@ library(batchtools)
 library(R6)
 library(evaluate)
 library(data.table)
+library(ParamHelpers)
 
 # Learners
 library(rpart)
