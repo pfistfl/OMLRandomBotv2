@@ -16,4 +16,7 @@ get_task_metadata = function(oml.task = NULL) {
   return(md)
 }
 
-
+#' Get a task name from a task.id
+get_task_name = function(task.id) {
+  cc18[cc18$task.id == task.id, "name"]
+}

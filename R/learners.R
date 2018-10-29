@@ -5,7 +5,7 @@ list_learners = function(task) {
   # Only list learners that work with the task:
   bot.lrns = c("classif.glmnet", "classif.rpart", "classif.kknn",
   	"classif.svm", "classif.ranger", "classif.xgboost")
-  avail.lrns = listLearners(task, quiet = TRUE,
+  avail.lrns = mlr::listLearners(task, quiet = TRUE,
    warn.missing.packages = FALSE)$class
   lrn.inds = which(bot.lrns %in% avail.lrns)
   return(learners = bot.lrns[lrn.inds])
@@ -23,8 +23,7 @@ get_learner_probs = function(learners, sampling = "parset_dims") {
     wts = rep(1, seq_along(learners))
   } else if (sampling == "parset_dims") {
     wts = sapply(learners, function(x) {
-      lrn = makeLearner(x)
-      parset = get_parset(lrn, add_fixed_pars = FALSE)
+      parset = get_parset(x, add_fixed_pars = FALSE)
       getParamNr(parset)
     })
   }

@@ -1,16 +1,12 @@
-library(R6)
-library(OpenML)
-library(BBmisc)
-
 #-----------------------------------------------------------------------------------------
-#' Class OMLBot
+#' R6-Class OMLBot
+#'
 #' Public Members:
 #' task.id [character(1)]
 #' task [Task]
 #'
-#' initialize [function(task.id)]
-#' run [function()]
-#' run_internal
+#' initialize [function(task.id)]: instantiate a new bot with a given oml task.id
+#' run [function(timeout)] : draw random learner/config and run the bot
 #'
 #' Private Members:
 #' learner [learner]
@@ -18,30 +14,27 @@ library(BBmisc)
 #' pars [list]
 #'
 #' get_learner_config [function()]
-#'
-Bot = R6Class("OMLBot",
+#' run_internal [function()]
+OMLBot = R6::R6Class("OMLBot",
 
   public = list(
     task.id = NULL,
     oml.task = NULL,
     task = NULL,
-    timeout = 360,
+    timeout = NULL,
 
     initialize = function(task.id) {
       self$task.id = task.id
     },
-    run = function () {
+    run = function (timeout = NULL) {
+      self$timeout = ifelse(is.null(timeout), Inf, assert_integerish(timeout))
       self$oml.task = OpenML::getOMLTask(as.numeric(self$task.id))
       self$task = OpenML::convertOMLTaskToMlr(self$oml.task)$mlr.task
       lrn = private$get_learner_config()
       measures = private$get_measures()
       # Run training in a separate process with a specified timeout
-      callr::r(self$run_internal, args = list(oml.task = self$oml.task, lrn = lrn, measures = measures),
+      callr::r(private$run_internal, args = list(oml.task = self$oml.task, lrn = lrn, measures = measures),
         timeout = self$timeout)
-    },
-    run_internal = function(oml.task, lrn, measures) {
-      options(mlr.show.info = TRUE)
-      OpenML::runTaskMlr(task = oml.task, learner = lrn, measures = measures)
     }
   ),
 
@@ -49,12 +42,17 @@ Bot = R6Class("OMLBot",
     learner = NULL,
     parset = NULL,
     pars = NULL,
-    get_learner_config = function() {}
+    get_learner_config = function() {},
+    run_internal = function(oml.task, lrn, measures) {
+      options("mlr.show.info" = TRUE)
+      OpenML::runTaskMlr(task = oml.task, learner = lrn, measures = measures)
+    }
     )
 )
 
 #-----------------------------------------------------------------------------------------
-#' Class RandomOMLBot
+#' R6-Class OMLRandomBot
+#'
 #' inherits from [OMLBot]
 #' Public Members:
 #' < inherited >
@@ -66,8 +64,8 @@ Bot = R6Class("OMLBot",
 #' get_learner_parset [function()]
 #' sample_random_config [function()]
 #'
-RandomBot = R6Class("RandomOMLBot",
-  inherit = Bot,
+OMLRandomBot = R6::R6Class("OMLRandomBot",
+  inherit = OMLBot,
 
   public = list(),
 
