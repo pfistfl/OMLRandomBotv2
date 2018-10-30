@@ -5,8 +5,10 @@ list_learners = function(task) {
   # Only list learners that work with the task:
   bot.lrns = c("classif.glmnet", "classif.rpart", "classif.kknn",
   	"classif.svm", "classif.ranger", "classif.xgboost")
-  avail.lrns = mlr::listLearners(task, quiet = TRUE,
-   warn.missing.packages = FALSE)$class
+  # FIXME: Is this to strict?
+  # We might want to allow for wrappers
+  avail.lrns = mlr::listLearners(task, properties = c("multiclass", "missings", "probs"),
+   quiet = TRUE, warn.missing.packages = FALSE)$class
   lrn.inds = which(bot.lrns %in% avail.lrns)
   return(learners = bot.lrns[lrn.inds])
 }

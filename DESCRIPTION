@@ -1,7 +1,7 @@
 Package: OMLRandomBotv2
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R:
     person(given = "First",
            family = "Last",
            role = c("aut", "cre"),
@@ -13,14 +13,14 @@ LazyData: true
 Depends:
     mlr,
     ParamHelpers (>= 1.10),
-    R (>= 3.0.2)
-Suggests: 
+    R (>= 3.0.2),
+    checkmate (>= 1.8.2)
+Suggests:
     testthat
-Imports: 
+Imports:
     R6,
     OpenML,
     data.table,
     batchtools,
-    callr,
-    checkmate (>= 1.8.2)
+    callr
 RoxygenNote: 6.0.1
