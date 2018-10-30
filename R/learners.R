@@ -73,6 +73,8 @@ get_parset = function(learner, oml.task = NULL, add_fixed_pars = TRUE) {
         makeNumericParam("sample.fraction", lower = 0.1, upper = 1),
         makeIntegerParam("mtry", lower = 0, upper = task.metadata$p),
         makeDiscreteParam("respect.unordered.factors", values = c("ignore", "order", "partition")),
+        #FIXME: Compare to trafo from old random bot
+        # makeIntegerParam("min.node.size", lower = 0, upper = 1, trafo = function(x) task.metadata$n^x),
         makeIntegerParam("min.node.size", lower = 1, upper = min(60, task.metadata$n)),
         makeDiscreteParam("splitrule", values = c("gini", "extratrees")))
         )
