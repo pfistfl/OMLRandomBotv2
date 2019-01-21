@@ -50,6 +50,7 @@ OMLBot = R6::R6Class("OMLBot",
     get_learner_and_config = function() {makeLearner("classif.rpart", predict.type = "prob")},
     add_learner_wrappers = function() {self$learner},
     run_internal = function(oml.task, lrn, measures) {
+      ulimit::memory_limit(2000)
       options("mlr.show.info" = TRUE)
       OpenML::runTaskMlr(task = oml.task, learner = lrn, measures = measures)
     }
