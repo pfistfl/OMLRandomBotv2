@@ -19,6 +19,7 @@ OMLBot = R6::R6Class("OMLBot",
 
   public = list(
     task.id = NULL,
+    filepath = NULL,
     oml.task = NULL,
     task = NULL,
     learner = NULL,
@@ -31,8 +32,7 @@ OMLBot = R6::R6Class("OMLBot",
     run = function (timeout = NULL, max.memory = NULL) {
       # Set timeout
       self$timeout = ifelse(is.null(timeout), Inf, assert_integerish(timeout))
-
-      self$oml.task = OpenML::getOMLTask(as.numeric(self$task.id))
+      self$oml.task = self$get_oml_task()
       self$task = OpenML::convertOMLTaskToMlr(self$oml.task)$mlr.task
       self$learner = private$get_learner_and_config()
       self$learner = private$add_learner_wrappers()
@@ -49,11 +49,17 @@ OMLBot = R6::R6Class("OMLBot",
     pars = NULL,
     get_learner_and_config = function() {makeLearner("classif.rpart", predict.type = "prob")},
     add_learner_wrappers = function() {self$learner},
+    get_task_oml = function() {
+      if (is.null(self$filepath)) {
+        OpenML::getOMLTask(as.numeric(self$task.id))
+      } else {
+        readRDS(self$filepath)
+      }
+    },
     run_internal = function(oml.task, lrn, measures) {
-      ulimit::memory_limit(2000)
       options("mlr.show.info" = TRUE)
       OpenML::runTaskMlr(task = oml.task, learner = lrn, measures = measures)
-    }
+    },
     )
 )
 
